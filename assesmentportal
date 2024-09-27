@@ -1,0 +1,214 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Assessment Feedback Portal</title>
+    <style>
+        /* Hey there! Let's make this look like a proper UK government website. */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+            color: #0b0c0c;
+            margin: 0;
+            padding: 0;
+        }
+        .govuk-width-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        .govuk-header {
+            background: #0b0c0c;
+            padding: 10px 0;
+            color: white;
+        }
+        .govuk-header__content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center.
+        }
+        .govuk-header__logotype {
+            font-weight: 700;
+            font-size: 30px;
+            text-decoration: none;
+            color: white;
+        }
+        .govuk-header__navigation {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .govuk-header__navigation-item {
+            margin-left: 15px;
+        }
+        .govuk-header__navigation-item a {
+            color: white;
+            text-decoration: none;
+        }
+        .govuk-main-wrapper {
+            padding: 20px 0;
+        }
+        h1, h2, h3 {
+            color: #0b0c0c;
+            font-weight: 700;
+        }
+        .govuk-heading-xl {
+            font-size: 48px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .govuk-heading-l {
+            font-size: 36px;
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+        .govuk-body {
+            font-size: 19px;
+            margin-bottom: 20px.
+        }
+        .govuk-section-break {
+            border: none;
+            border-bottom: 1px solid #b1b4b6;
+            margin: 30px 0;
+        }
+        /* Let's add some styles for our new features */
+        .govuk-button {
+            background-color: #00703c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 19px;
+            cursor: pointer;
+        }
+        .govuk-button:hover {
+            background-color: #005a30.
+        }
+        .govuk-file-upload {
+            margin-bottom: 20px.
+        }
+        .govuk-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #0b0c0c;
+            border-radius: 5px;
+            font-size: 19px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="govuk-header" role="banner" data-module="govuk-header">
+        <div class="govuk-width-container">
+            <div class="govuk-header__content">
+                <a href="/" class="govuk-header__logotype">
+                    Expert Assessment Portal
+                </a>
+                <nav>
+                    <ul class="govuk-header__navigation">
+                        <li class="govuk-header__navigation-item">
+                            <a href="#about">About</a>
+                        </li>
+                        <li class="govuk-header__navigation-item">
+                            <a href="#assessments">Assessments</a>
+                        </li>
+                        <li class="govuk-header__navigation-item">
+                            <a href="#upload">Upload CPD</a>
+                        </li>
+                        <li class="govuk-header__navigation-item">
+                            <a href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="govuk-width-container">
+        <main class="govuk-main-wrapper" id="main-content" role="main">
+            <h1 class="govuk-heading-xl">Expert Assessment Feedback Portal</h1>
+            
+            <section id="about">
+                <h2 class="govuk-heading-l">About This Portal</h2>
+                <p class="govuk-body">
+                    Welcome to our Expert Assessment Feedback Portal! This is where you can upload and manage your Continuing Professional Development (CPD) assessments. We've designed this platform to meet high professional standards for submitting, verifying credibility, and showcasing your skills and expertise.
+                </p>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--visible">
+
+            <section id="assessments">
+                <h2 class="govuk-heading-l">Assessment Feedbacks</h2>
+                <p class="govuk-body">
+                    Here you can find detailed assessment reports for various experts. Each report undergoes a thorough review process to ensure accuracy and relevance.
+                </p>
+                <!-- This is where we'll dynamically load the assessment feedbacks -->
+                <div id="assessment-list">
+                    <!-- Assessment items will be populated here -->
+                </div>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--visible">
+
+            <section id="upload">
+                <h2 class="govuk-heading-l">Upload Your CPD</h2>
+                <p class="govuk-body">
+                    Use this form to upload your CPD assessments and provide additional insights.
+                </p>
+                <form id="cpd-upload-form">
+                    <div class="govuk-file-upload">
+                        <label for="cpd-file">Upload CPD File:</label>
+                        <input type="file" id="cpd-file" name="cpd-file" accept=".pdf,.doc,.docx">
+                    </div>
+                    <div>
+                        <label for="cpd-insights">Additional Insights:</label>
+                        <textarea id="cpd-insights" name="cpd-insights" class="govuk-textarea" rows="5" placeholder="Provide any additional context or insights about your CPD..."></textarea>
+                    </div>
+                    <button type="submit" class="govuk-button">Submit CPD</button>
+                </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--visible">
+
+            <section id="contact">
+                <h2 class="govuk-heading-l">Contact Us</h2>
+                <p class="govuk-body">
+                    For inquiries about the assessment process or to submit new assessments, please contact our office:
+                </p>
+                <p class="govuk-body">
+                    Email: assessments@expertportal.gov.uk<br>
+                    Phone: 020 7123 4567
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('cpd-upload-form');
+            const assessmentList = document.getElementById('assessment-list');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const file = document.getElementById('cpd-file').files[0];
+                const insights = document.getElementById('cpd-insights').value;
+
+                const newAssessment = document.createElement('div');
+                newAssessment.innerHTML = `
+                    <h3>${file.name}</h3>
+                    <p>${insights}</p>
+                    <hr>
+                `;
+
+                assessmentList.appendChild(newAssessment);
+
+                form.reset();
+
+                alert('CPD uploaded successfully!');
+            });
+        });
+    </script>
+
+
+</body></html>
