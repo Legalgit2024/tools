@@ -1,15 +1,3 @@
-Let's continue from where we left off and enhance the `addThumbnail` function for better handling of multiple video snippets. We'll improve how the thumbnails are displayed, provide better handling of clip information, and allow users to download or play their selected clips. 
-
-Here’s how we can extend the functionality for thumbnails and add features for clip download and playback.
-
-### Key Improvements:
-1. **Thumbnails Display**: Make thumbnails clickable so users can preview the generated video snippets.
-2. **Download Button**: Allow users to download the created video clips.
-3. **Play Clip**: Add functionality to play the clipped video when a thumbnail is clicked.
-
-### Updated `addThumbnail` Function and Related Changes:
-
-```html
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -142,7 +130,6 @@ Here’s how we can extend the functionality for thumbnails and add features for
         #moments {
             margin-top: 20px;
         }
-
     </style>
 </head>
 <body>
@@ -319,7 +306,6 @@ Here’s how we can extend the functionality for thumbnails and add features for
                         <p>${result.description}</p>
                         <p>Duration: ${result.duration} | Views: ${result.views}</p>
                     `;
-
                 } catch (error) {
                     alert('Video processing failed. Please try again.');
                 }
