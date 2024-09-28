@@ -1,5 +1,68 @@
-<html lang="en">
-<head>
+<html><head>
+    <title>HTML Editor and LLM/GPT Integration Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        #preview {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            padding: 10px;
+            min-height: 200px;
+        }
+        #chat {
+            margin-top: 40px;
+        }
+        #chat-messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #chat-input {
+            width: 100%;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            color: #0000cc;
+        }
+        .assistant-message {
+            color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML Editor and LLM/GPT Integration Tool</h1>
+
+    <h2>HTML Editor</h2>
+    <textarea id="html-input" placeholder="Enter your HTML code here"></textarea>
+    <button id="save-button">Save as HTML File</button>
+    <div id="preview">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Powered Video Analyzer</title>
@@ -131,8 +194,8 @@
             margin-top: 20px;
         }
     </style>
-</head>
-<body>
+
+
     <div class="container">
         <div class="left-column">
             <h1>AI-Powered Video Analyzer</h1>
@@ -153,7 +216,7 @@
         </div>
 
         <div class="right-column">
-            <video id="videoPlayer" controls></video>
+            <video id="videoPlayer" controls=""></video>
 
             <div id="headerSection" class="header" style="display: none;"></div>
 
@@ -330,5 +393,99 @@
 
         getAIModels();
     </script>
-</body>
-</html>
+
+</div>
+
+    <h2>LLM/GPT Integration</h2>
+    <label for="api-key">OpenAI API Key:</label>
+    <input type="text" id="api-key" placeholder="Enter your OpenAI API key">
+
+    <div id="chat">
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Type your message here">
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+        // Update preview when HTML input changes
+        const htmlInput = document.getElementById('html-input');
+        const preview = document.getElementById('preview');
+        htmlInput.addEventListener('input', () => {
+            preview.innerHTML = htmlInput.value;
+        });
+
+        // Save HTML as file
+        const saveButton = document.getElementById('save-button');
+        saveButton.addEventListener('click', () => {
+            const content = htmlInput.value;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'download.html';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Chat functionality
+        const apiKeyInput = document.getElementById('api-key');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const sendButton = document.getElementById('send-button');
+
+        sendButton.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            if (!message) return;
+            if (!apiKey) {
+                alert('Please enter your OpenAI API key.');
+                return;
+            }
+
+            // Display user's message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.textContent = 'You: ' + message;
+            chatMessages.appendChild(userMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Prepare the request payload
+            const data = {
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: message }]
+            };
+
+            // Call OpenAI API
+            fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+                const assistantMessage = document.createElement('div');
+                assistantMessage.className = 'message assistant-message';
+                assistantMessage.textContent = 'Assistant: ' + data.choices[0].message.content.trim();
+                chatMessages.appendChild(assistantMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(error => {
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message assistant-message';
+                errorMessage.textContent = 'Error: ' + error.message;
+                chatMessages.appendChild(errorMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+
+            // Clear chat input
+            chatInput.value = '';
+        });
+    </script>
+
+</body></html>
