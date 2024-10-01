@@ -97,6 +97,13 @@
         }
     </style>
 </head>
+<!-- PDF Viewer Modal -->
+<div id="pdf-modal" class="govuk-modal" style="display:none;">
+  <div class="govuk-modal-content">
+    <span id="close-modal" class="govuk-modal-close" style="cursor:pointer;">&times;</span>
+    <iframe id="pdf-viewer" width="100%" height="600px"></iframe>
+  </div>
+</div>
 <body>
     <header class="govuk-header" role="banner" data-module="govuk-header">
         <div class="govuk-width-container">
@@ -195,7 +202,50 @@
                 const insights = document.getElementById('cpd-insights').value;
 
                 const newAssessment = document.createElement('div');
-                newAssessment.innerHTML = `
+               <!-- PDF Viewer Modal -->
+<div id="pdf-modal" class="govuk-modal" style="display:none;">
+    <div class="govuk-modal-content">
+        <span id="close-modal" class="govuk-modal-close" style="cursor:pointer;">&times;</span>
+        <iframe id="pdf-viewer" width="100%" height="600px"></iframe>
+    </div>
+</div>
+ newAssessment.innerHTML = `
+ newAssessment.innerHTML = `
+    <h3>${file.name}</h3>
+    <p>${insights}</p>
+    <button class="view-pdf-button">View PDF</button>
+    <hr>
+`;
+
+// Add new event listener to view the uploaded PDF
+const viewPdfButton = newAssessment.querySelector('.view-pdf-button');
+viewPdfButton.addEventListener('click', function() {
+    const pdfModal = document.getElementById('pdf-modal');
+    const pdfViewer = document.getElementById('pdf-viewer');
+
+    // Create a URL for the uploaded PDF file
+    const fileURL = URL.createObjectURL(file);
+
+    // Set the PDF in the modal's iframe for display
+    pdfViewer.src = fileURL;
+
+    // Show the modal
+    pdfModal.style.display = 'block';
+
+    // Add event listener to close the modal
+    const closeModal = document.getElementById('close-modal');
+    closeModal.addEventListener('click', function() {
+        pdfModal.style.display = 'none';
+    });
+});
+
+// Append the new assessment
+assessmentList.appendChild(newAssessment);
+
+// Reset the form after upload
+form.reset();
+
+alert('CPD uploaded successfully!');
                     <h3>${file.name}</h3>
                     <p>${insights}</p>
                     <hr>
