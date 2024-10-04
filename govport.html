@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUSTICEMINDS Secure Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1a3c6e;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-area {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: white;
+        }
+        .input-area {
+            padding: 20px;
+            background-color: #e9ecef;
+        }
+        .card-column {
+            width: 300px;
+            background-color: #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .card {
+            background-color: #2c5799;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .thumbnail {
+            width: calc(33.33% - 5px);
+            padding-top: calc(33.33% - 5px);
+            background-size: cover;
+            background-position: center;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+        .chat-message.sent {
+            background-color: #d4edda;
+            margin-left: 20%;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #1a3c6e;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2c5799;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .chat-participant {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            margin-bottom: 5px;
+            background-color: #2c5799;
+            border-radius: 3px;
+        }
+        .chat-participant img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .logo {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        .add-participant {
+            display: flex;
+            margin-top: 10px;
+        }
+        .add-participant input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .add-participant button {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <img src="justiceminds_logo.png" alt="JUSTICEMINDS Logo" class="logo">
+            <h2>Participants</h2>
+            <div id="participantsList"></div>
+            <div class="add-participant">
+                <input type="text" id="newParticipant" placeholder="Add participant...">
+                <button onclick="addParticipant()">+</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="chat-area" id="chatArea">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="input-area" id="inputArea">
+                <input type="text" id="messageInput" placeholder="Type your message...">
+                <button onclick="sendMessage()" id="sendButton">Send</button>
+            </div>
+        </div>
+        <div class="card-column" id="cardColumn">
+            <!-- Cards will be added here -->
+        </div>
+    </div>
+
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="fileTitle"></h2>
+            <div id="fileContent"></div>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="userName"></h2>
+            <img id="userImage" src="" alt="User Image" style="max-width: 100%; height: auto;">
+            <p id="userBio"></p>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const sidebar = document.getElementById('sidebar');
+        const cardColumn = document.getElementById('cardColumn');
+        const fileModal = document.getElementById('fileModal');
+        const userModal = document.getElementById('userModal');
+        const fileTitle = document.getElementById('fileTitle');
+        const fileContent = document.getElementById('fileContent');
+        const userName = document.getElementById('userName');
+        const userImage = document.getElementById('userImage');
+        const userBio = document.getElementById('userBio');
+        const participantsList = document.getElementById('participantsList');
+        const newParticipantInput = document.getElementById('newParticipant');
+
+        // Check if this is the view-only version
+        const isViewOnly = new URLSearchParams(window.location.search).get('view') === 'true';
+
+        if (isViewOnly) {
+            document.getElementById('inputArea').style.display = 'none';
+        }
+
+        function sendMessage() {
+            if (isViewOnly) return;
+            const message = messageInput.value;
+            if (message.trim() === '') return;
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', 'sent');
+            messageElement.textContent = `You: ${message}`;
+            chatArea.appendChild(messageElement);
+
+            messageInput.value = '';
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addParticipant() {
+            const name = newParticipantInput.value.trim();
+            if (name === '') return;
+
+            addChatParticipant(name);
+            newParticipantInput.value = '';
+        }
+
+        function addChatParticipant(name) {
+            const participantElement = document.createElement('div');
+            participantElement.classList.add('chat-participant');
+            
+            const img = document.createElement('img');
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+            img.alt = name;
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = name;
+            
+            participantElement.appendChild(img);
+            participantElement.appendChild(nameSpan);
+            participantElement.onclick = () => showUserInfo(name);
+            participantsList.appendChild(participantElement);
+        }
+
+        function addCard(title, files) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            
+            const titleElement = document.createElement('div');
+            titleElement.classList.add('card-title');
+            titleElement.textContent = title;
+            cardElement.appendChild(titleElement);
+
+            const thumbnailContainer = document.createElement('div');
+            thumbnailContainer.classList.add('thumbnail-container');
+
+            files.forEach((file, index) => {
+                if (index < 9) {
+                    const thumbnail = document.createElement('div');
+                    thumbnail.classList.add('thumbnail');
+                    thumbnail.style.backgroundImage = `url(${file.thumbnail})`;
+                    thumbnail.onclick = () => showFile(file.title, file.content);
+                    thumbnailContainer.appendChild(thumbnail);
+                }
+            });
+
+            cardElement.appendChild(thumbnailContainer);
+            cardColumn.appendChild(cardElement);
+        }
+
+        function showFile(title, content) {
+            fileTitle.textContent = title;
+            fileContent.innerHTML = content;
+            fileModal.style.display = 'block';
+        }
+
+        function showUserInfo(name) {
+            userName.textContent = name;
+            userImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=200&background=random`;
+            userBio.textContent = `Bio for ${name} would be displayed here.`;
+            userModal.style.display = 'block';
+        }
+
+        // Close modal when clicking on <span> (x)
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.onclick = function() {
+                fileModal.style.display = 'none';
+                userModal.style.display = 'none';
+            }
+        });
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == fileModal) {
+                fileModal.style.display = 'none';
+            }
+            if (event.target == userModal) {
+                userModal.style.display = 'none';
+            }
+        }
+
+        // Add some example participants
+        addChatParticipant('John Doe');
+        addChatParticipant('Jane Smith');
+        addChatParticipant('Alice Johnson');
+
+        // Add some example cards with files
+        addCard('Project Alpha', [
+            {title: 'Document 1', thumbnail: 'https://via.placeholder.com/100?text=Doc1', content: '<p>This is the content of Document 1.</p>'},
+            {title: 'Image 1', thumbnail: 'https://via.placeholder.com/100?text=Image1', content: '<img src="https://via.placeholder.com/400x300" alt="Image 1">'},
+            {title: 'Spreadsheet', thumbnail: 'https://via.placeholder.com/100?text=Sheet', content: '<p>Spreadsheet data would be displayed here.</p>'},
+            {title: 'Video 1', thumbnail: 'https://via.placeholder.com/100?text=Video1', content: '<video controls><source src="https://example.com/video1.mp4" type="video/mp4"></video>'},
+            {title: 'Audio 1', thumbnail: 'https://via.placeholder.com/100?text=Audio1', content: '<audio controls><source src="https://example.com/audio1.mp3" type="audio/mpeg"></audio>'},
+        ]);
+
+        addCard('Project Beta', [
+            {title: 'Report', thumbnail: 'https://via.placeholder.com/100?text=Report', content: '<p>This is the project report.</p>'},
+            {title: 'Presentation', thumbnail: 'https://via.placeholder.com/100?text=Pres', content: '<p>Presentation slides would be displayed here.</p>'},
+            {title: 'Budget', thumbnail: 'https://via.placeholder.com/100?text=Budget', content: '<p>Budget details would be shown here.</p>'},
+        ]);
+
+        // Add some example messages
+        function addExampleMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message');
+            messageElement.textContent = `${sender}: ${message}`;
+            chatArea.appendChild(messageElement);
+        }
+
+        addExampleMessage('John Doe', 'Hello everyone, welcome to the secure chat.');
+        addExampleMessage('Jane Smith', 'Thanks, John. Glad to be here.');
+        addExampleMessage('Alice Johnson', 'Has anyone reviewed the latest document in Project Alpha?');
+    </script>
+</body>
+</html>
