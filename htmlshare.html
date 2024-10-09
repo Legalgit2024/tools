@@ -34,7 +34,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            z-index: 1000; /* Keep the sidebar always on top */
+            z-index: 1000;
         }
         .main-content {
             flex-grow: 1;
@@ -110,13 +110,6 @@
         #preview {
             height: 100%;
         }
-        .connecting-page-icon {
-            display: inline-block;
-            margin-left: 10px;
-            cursor: pointer;
-            color: var(--accent-color);
-            font-size: 16px;
-        }
     </style>
 </head>
 <body>
@@ -126,7 +119,6 @@
             <input type="file" id="fileInput" accept=".html,.css,.js,.png,.jpg,.jpeg,.gif" multiple>
             <button onclick="uploadFiles()">Upload Files</button>
             <div id="fileList"></div>
-            <button onclick="sharePage()">Share Page</button>
         </div>
         <div class="main-content">
             <div class="editor-container">
@@ -159,6 +151,7 @@
                 };
                 reader.readAsText(file);
             }
+            saveToLocalStorage();
         }
 
         function updateFileList() {
@@ -173,17 +166,7 @@
                 nameSpan.textContent = fileName;
                 nameSpan.onclick = () => loadFile(fileName);
                 
-                const connectingPageIcon = document.createElement('span');
-                connectingPageIcon.className = 'connecting-page-icon';
-                connectingPageIcon.textContent = '✎';
-                connectingPageIcon.title = 'Add Connecting Page';
-                connectingPageIcon.onclick = (e) => {
-                    e.stopPropagation();
-                    addConnectingPage(fileName);
-                };
-                
                 fileItem.appendChild(nameSpan);
-                fileItem.appendChild(connectingPageIcon);
                 fileList.appendChild(fileItem);
             }
         }
@@ -202,6 +185,7 @@
             
             if (currentFile) {
                 files[currentFile] = editor.value;
+                saveToLocalStorage();
             }
         }
 
@@ -215,17 +199,41 @@
             URL.revokeObjectURL(link.href);
         }
 
-        function addConnectingPage(fileName) {
-            const editor = document.getElementById('htmlEditor');
-            const linkHTML = `<a href="${fileName}" class="connecting-page-link">${fileName}</a>`;
-            editor.value += '\n' + linkHTML;
-            updatePreview();
+        function saveToLocalStorage() {
+            localStorage.setItem('savedFiles', JSON.stringify(files));
+            localStorage.setItem('currentFile', currentFile);
         }
 
-        function sharePage() {
-            const shareUrl = `${window.location.href}?editable=true`;
-            prompt("Copy this URL to share:", shareUrl);
+        function loadSavedFiles() {
+            const savedFiles = localStorage.getItem('savedFiles');
+            const savedCurrentFile = localStorage.getItem('currentFile');
+            if (savedFiles) {
+                files = JSON.parse(savedFiles);
+                updateFileList();
+            }
+            if (savedCurrentFile) {
+                currentFile = savedCurrentFile;
+                loadFile(currentFile);
+            }
         }
+
+        // Call this function when the page loads
+        window.onload = loadSavedFiles;
+
+        // Auto-save every 5 seconds
+        setInterval(() => {
+            if (currentFile) {
+                files[currentFile] = document.getElementById('htmlEditor').value;
+                saveToLocalStorage();
+                console.log(`Auto-saved ${currentFile}`);
+            }
+        }, 5000);
+
+        // Warn before unload
+        window.addEventListener('beforeunload', function (e) {
+            e.preventDefault();
+            e.returnValue = '';
+        });
 
         // Resizable panels
         const resizeHandle = document.getElementById('resizeHandle');
