@@ -34,6 +34,7 @@
             top: 0;
             left: 0;
             bottom: 0;
+            z-index: 1000; /* Keep the sidebar always on top */
         }
         .main-content {
             flex-grow: 1;
@@ -125,6 +126,7 @@
             <input type="file" id="fileInput" accept=".html,.css,.js,.png,.jpg,.jpeg,.gif" multiple>
             <button onclick="uploadFiles()">Upload Files</button>
             <div id="fileList"></div>
+            <button onclick="sharePage()">Share Page</button>
         </div>
         <div class="main-content">
             <div class="editor-container">
@@ -218,6 +220,11 @@
             const linkHTML = `<a href="${fileName}" class="connecting-page-link">${fileName}</a>`;
             editor.value += '\n' + linkHTML;
             updatePreview();
+        }
+
+        function sharePage() {
+            const shareUrl = `${window.location.href}?editable=true`;
+            prompt("Copy this URL to share:", shareUrl);
         }
 
         // Resizable panels
