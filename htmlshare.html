@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI HTML Editor</title>
+    <style>
+        :root {
+            --bg-color: #1c1c1e;
+            --text-color: #ffffff;
+            --accent-color: #0a84ff;
+            --secondary-bg: #2c2c2e;
+        }
+        body, html {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary-bg);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid var(--accent-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+            margin-left: 250px;
+        }
+        .editor-container, .preview-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .resize-handle {
+            width: 10px;
+            background-color: var(--accent-color);
+            cursor: col-resize;
+        }
+        h1, h2 {
+            color: var(--accent-color);
+        }
+        #fileList {
+            margin-top: 20px;
+        }
+        .file-item {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+        }
+        .file-item:hover {
+            background-color: var(--accent-color);
+        }
+        .file-name {
+            display: inline-block;
+            width: 100%;
+        }
+        #editor, #preview {
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            height: calc(100% - 60px);
+        }
+        textarea {
+            width: 100%;
+            height: calc(100% - 50px);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            resize: none;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #preview {
+            height: 100%;
+        }
+        .connecting-page-icon {
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>AI HTML Editor</h2>
+            <input type="file" id="fileInput" accept=".html,.css,.js,.png,.jpg,.jpeg,.gif" multiple>
+            <button onclick="uploadFiles()">Upload Files</button>
+            <div id="fileList"></div>
+        </div>
+        <div class="main-content">
+            <div class="editor-container">
+                <div id="editor">
+                    <textarea id="htmlEditor"></textarea>
+                    <button onclick="updatePreview()">Update Preview</button>
+                    <button onclick="saveAsHTML()">Save as HTML</button>
+                </div>
+            </div>
+            <div class="resize-handle" id="resizeHandle"></div>
+            <div class="preview-container">
+                <h2>Live Preview</h2>
+                <div id="preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let files = {};
+        let currentFile = '';
+
+        function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            for (let file of fileInput.files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    files[file.name] = e.target.result;
+                    updateFileList();
+                    loadFile(file.name);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            for (let fileName in files) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'file-name';
+                nameSpan.textContent = fileName;
+                nameSpan.onclick = () => loadFile(fileName);
+                
+                const connectingPageIcon = document.createElement('span');
+                connectingPageIcon.className = 'connecting-page-icon';
+                connectingPageIcon.textContent = '✎';
+                connectingPageIcon.title = 'Add Connecting Page';
+                connectingPageIcon.onclick = (e) => {
+                    e.stopPropagation();
+                    addConnectingPage(fileName);
+                };
+                
+                fileItem.appendChild(nameSpan);
+                fileItem.appendChild(connectingPageIcon);
+                fileList.appendChild(fileItem);
+            }
+        }
+
+        function loadFile(fileName) {
+            currentFile = fileName;
+            const editor = document.getElementById('htmlEditor');
+            editor.value = files[fileName];
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const editor = document.getElementById('htmlEditor');
+            const preview = document.getElementById('preview');
+            preview.innerHTML = editor.value;
+            
+            if (currentFile) {
+                files[currentFile] = editor.value;
+            }
+        }
+
+        function saveAsHTML() {
+            if (!currentFile) return;
+            const blob = new Blob([files[currentFile]], { type: "text/html" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = currentFile;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function addConnectingPage(fileName) {
+            const editor = document.getElementById('htmlEditor');
+            const linkHTML = `<a href="${fileName}" class="connecting-page-link">${fileName}</a>`;
+            editor.value += '\n' + linkHTML;
+            updatePreview();
+        }
+
+        // Resizable panels
+        const resizeHandle = document.getElementById('resizeHandle');
+        const editorContainer = document.querySelector('.editor-container');
+        const previewContainer = document.querySelector('.preview-container');
+        let isResizing = false;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.removeEventListener('mousemove', handleMouseMove);
+            });
+        });
+
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+            const containerWidth = editorContainer.parentElement.clientWidth;
+            const newEditorWidth = e.clientX - editorContainer.offsetLeft;
+            const editorPercentage = (newEditorWidth / containerWidth) * 100;
+            editorContainer.style.flex = `0 0 ${editorPercentage}%`;
+            previewContainer.style.flex = `0 0 ${100 - editorPercentage}%`;
+        }
+    </script>
+</body>
+</html>
