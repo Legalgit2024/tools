@@ -8,7 +8,7 @@
         :root {
             --bg-color: #1c1c1e;
             --text-color: #ffffff;
-            --accent-color: #0a84ff;
+            --accent-color: #a35cff;
             --secondary-bg: #2c2c2e;
         }
         body, html {
@@ -23,6 +23,7 @@
         .container {
             display: flex;
             height: 100vh;
+            position: relative;
         }
         .sidebar {
             width: 250px;
@@ -37,21 +38,25 @@
             z-index: 1000;
         }
         .main-content {
-            flex-grow: 1;
             display: flex;
-            overflow: hidden;
+            width: calc(100% - 250px);
             margin-left: 250px;
+            height: 100%;
         }
-        .editor-container, .preview-container {
-            flex: 1;
+        .editor-container {
+            width: 40%;
             padding: 20px;
             overflow-y: auto;
             position: relative;
+            background-color: var(--bg-color);
+            border-right: 1px solid var(--accent-color);
         }
-        .resize-handle {
-            width: 10px;
-            background-color: var(--accent-color);
-            cursor: col-resize;
+        .preview-container {
+            width: 60%;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-color);
         }
         h1, h2 {
             color: var(--accent-color);
@@ -73,18 +78,12 @@
         .file-item:hover {
             background-color: var(--accent-color);
         }
-        .file-name {
-            display: inline-block;
-            width: 100%;
-        }
         #editor, #preview {
             background-color: var(--secondary-bg);
             border-radius: 10px;
             padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
             height: calc(100% - 60px);
+            width: 100%;
         }
         textarea {
             width: 100%;
@@ -128,7 +127,6 @@
                     <button onclick="saveAsHTML()">Save as HTML</button>
                 </div>
             </div>
-            <div class="resize-handle" id="resizeHandle"></div>
             <div class="preview-container">
                 <h2>Live Preview</h2>
                 <div id="preview"></div>
@@ -151,7 +149,6 @@
                 };
                 reader.readAsText(file);
             }
-            saveToLocalStorage();
         }
 
         function updateFileList() {
@@ -185,7 +182,6 @@
             
             if (currentFile) {
                 files[currentFile] = editor.value;
-                saveToLocalStorage();
             }
         }
 
@@ -197,66 +193,6 @@
             link.download = currentFile;
             link.click();
             URL.revokeObjectURL(link.href);
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('savedFiles', JSON.stringify(files));
-            localStorage.setItem('currentFile', currentFile);
-        }
-
-        function loadSavedFiles() {
-            const savedFiles = localStorage.getItem('savedFiles');
-            const savedCurrentFile = localStorage.getItem('currentFile');
-            if (savedFiles) {
-                files = JSON.parse(savedFiles);
-                updateFileList();
-            }
-            if (savedCurrentFile) {
-                currentFile = savedCurrentFile;
-                loadFile(currentFile);
-            }
-        }
-
-        // Call this function when the page loads
-        window.onload = loadSavedFiles;
-
-        // Auto-save every 5 seconds
-        setInterval(() => {
-            if (currentFile) {
-                files[currentFile] = document.getElementById('htmlEditor').value;
-                saveToLocalStorage();
-                console.log(`Auto-saved ${currentFile}`);
-            }
-        }, 5000);
-
-        // Warn before unload
-        window.addEventListener('beforeunload', function (e) {
-            e.preventDefault();
-            e.returnValue = '';
-        });
-
-        // Resizable panels
-        const resizeHandle = document.getElementById('resizeHandle');
-        const editorContainer = document.querySelector('.editor-container');
-        const previewContainer = document.querySelector('.preview-container');
-        let isResizing = false;
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', () => {
-                isResizing = false;
-                document.removeEventListener('mousemove', handleMouseMove);
-            });
-        });
-
-        function handleMouseMove(e) {
-            if (!isResizing) return;
-            const containerWidth = editorContainer.parentElement.clientWidth;
-            const newEditorWidth = e.clientX - editorContainer.offsetLeft;
-            const editorPercentage = (newEditorWidth / containerWidth) * 100;
-            editorContainer.style.flex = `0 0 ${editorPercentage}%`;
-            previewContainer.style.flex = `0 0 ${100 - editorPercentage}%`;
         }
     </script>
 </body>
