@@ -63,18 +63,19 @@
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background-color: rgba(15, 15, 15, 0.9);
-            color: white;
-            position: fixed;
-            width: calc(100% - 320px);
-            top: 0;
-            left: 320px;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: rgba(15, 15, 15, 0.9);
+    color: white;
+    position: fixed;
+    width: 100%; /* Changed from calc(100% - 320px) */
+    top: 0;
+    left: 0; /* Changed from 320px */
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+};
         }
 
         .logo {
@@ -147,7 +148,7 @@
 <body class="vsc-initialized">
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
     <div class="sidebar">
-        <h3>Chart Insights</h3>
+        <h3>Chart Inventory</h3>
         <div class="stat-item">
             <h4>Cycle Time Variation</h4>
             <p>Shows the time taken for each stage of the process. Helps identify stages causing delays.</p>
@@ -187,7 +188,7 @@
             </div>
         </section>
         <footer>
-            <p>© 2024 Yuti Tools. All Rights Reserved.</p>
+            <p>© 2024 Justice Minds Tools. All Rights Reserved.</p>
             <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
         </footer>
     </div>
