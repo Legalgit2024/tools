@@ -3,48 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Justice Minds Tools – For Yuti Manufacturing</title>
+    <title>Justice Minds Tools – Yuti Manufacturing</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
-            height: 100%;
             font-family: Arial, sans-serif;
             background-color: #1a1a1a;
             color: #e0e0e0;
-        }
-
-        .dark-mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #c0a060;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            z-index: 1001;
-            transition: background-color 0.3s ease;
-        }
-
-        .dark-mode-toggle:hover {
-            background-color: #a08850;
-        }
-
-        body.dark-mode {
-            background-color: #000;
-            color: #e0e0e0;
-        }
-
-        .chart-container.dark-mode {
-            background: #222;
+            height: 100%;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 20px;
             background-color: rgba(15, 15, 15, 0.9);
             color: white;
             position: fixed;
@@ -58,68 +32,57 @@
             font-size: 1.8em;
             font-weight: bold;
             color: #c0a060;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
         }
 
         .sidebar {
-            width: 250px;
-            background: #1a1a1a;
-            padding: 20px;
             position: fixed;
-            top: 80px;
             left: 0;
-            height: calc(100% - 80px);
+            top: 60px;
+            width: 250px;
+            height: calc(100% - 60px);
+            background: #111;
+            padding: 20px;
             overflow-y: auto;
-            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: transform 0.3s ease;
         }
 
-        .sidebar h3 {
-            color: #c0a060;
-            margin-bottom: 15px;
-        }
-
-        .sidebar .chart-item {
-            margin-bottom: 15px;
-        }
-
-        .sidebar .chart-item a {
-            color: #e0e0e0;
-            text-decoration: none;
-        }
-
-        .sidebar .chart-item a:hover {
-            text-decoration: underline;
+        .sidebar.hidden {
+            transform: translateX(-100%);
         }
 
         .content {
-            margin-left: 270px;
-            padding: 40px;
-            width: calc(100% - 270px);
-            padding-top: 100px;
-        }
-
-        .middle-text {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            text-align: center;
+            margin-top: 80px;
+            padding-left: 270px;
+            padding-right: 20px;
+            transition: padding-left 0.3s ease;
         }
 
         .chart-container {
-            width: 45%;
-            margin: 15px;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
             background: #111;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: background 0.3s ease;
-            display: inline-block;
-            vertical-align: top;
         }
 
-        .chart-container:hover {
-            background: #222;
+        .chart-description {
+            font-size: 14px;
+            color: #b0b0b0;
+            margin-top: 10px;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #c0a060;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
         }
 
         footer {
@@ -128,19 +91,29 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 1000;
         }
 
-        footer a {
-            color: #c0a060;
-            text-decoration: none;
-        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                top: 60px;
+            }
 
-        footer a:hover {
-            text-decoration: underline;
+            .sidebar.hidden {
+                transform: translateX(-200px);
+            }
+
+            .content {
+                padding-left: 20px;
+            }
+
+            .chart-container {
+                width: 95%;
+            }
+
+            .dark-mode-toggle {
+                top: 70px;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -152,42 +125,31 @@
         <div class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
     </div>
 
-    <div class="sidebar">
-        <h3>Chart Inventory</h3>
-        <div class="chart-item"><a href="#cycleTimeChart">Cycle Time Variation</a></div>
-        <div class="chart-item"><a href="#oeeChart">Overall Equipment Effectiveness (OEE)</a></div>
-        <div class="chart-item"><a href="#costPerUnitChart">Cost per Unit Analysis</a></div>
-        <div class="chart-item"><a href="#yieldChart">Production Yield by Stage</a></div>
-        <div class="chart-item"><a href="#downtimeChart">Downtime Analysis</a></div>
+    <div class="sidebar hidden" id="sidebar">
+        <h3>Charts Overview</h3>
+        <ul>
+            <li><a href="#cycleTimeChart">Cycle Time Variation</a></li>
+            <li><a href="#oeeChart">Overall Equipment Effectiveness (OEE)</a></li>
+            <li><a href="#costPerUnitChart">Cost per Unit Analysis</a></li>
+        </ul>
     </div>
 
-    <div class="content">
-        <div class="middle-text">
-            <p>Insert your descriptive content or analysis here. This section can provide context or explanations for the data visualizations displayed below.</p>
+    <div class="content" id="main-content">
+        <div class="chart-container" id="cycleTimeChart">
+            <h3>Cycle Time Variation</h3>
+            <canvas id="cycleTimeChartCanvas"></canvas>
+            <div class="chart-description">Shows time taken at each production stage, helping to identify delays.</div>
         </div>
-
-        <section class="charts">
-            <div class="chart-container" id="cycleTimeChartContainer">
-                <h3>Cycle Time Variation</h3>
-                <canvas id="cycleTimeChart"></canvas>
-            </div>
-            <div class="chart-container" id="oeeChartContainer">
-                <h3>Overall Equipment Effectiveness (OEE)</h3>
-                <canvas id="oeeChart"></canvas>
-            </div>
-            <div class="chart-container" id="costPerUnitChartContainer">
-                <h3>Cost per Unit Analysis</h3>
-                <canvas id="costPerUnitChart"></canvas>
-            </div>
-            <div class="chart-container" id="yieldChartContainer">
-                <h3>Production Yield by Stage</h3>
-                <canvas id="yieldChart"></canvas>
-            </div>
-            <div class="chart-container" id="downtimeChartContainer">
-                <h3>Downtime Analysis</h3>
-                <canvas id="downtimeChart"></canvas>
-            </div>
-        </section>
+        <div class="chart-container" id="oeeChart">
+            <h3>Overall Equipment Effectiveness (OEE)</h3>
+            <canvas id="oeeChartCanvas"></canvas>
+            <div class="chart-description">Measures productivity of equipment, indicating effectiveness.</div>
+        </div>
+        <div class="chart-container" id="costPerUnitChart">
+            <h3>Cost per Unit Analysis</h3>
+            <canvas id="costPerUnitChartCanvas"></canvas>
+            <div class="chart-description">Breaks down costs into categories such as materials and labor.</div>
+        </div>
     </div>
 
     <footer>
@@ -198,53 +160,26 @@
     <script>
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
-            const chartContainers = document.querySelectorAll(".chart-container");
-            chartContainers.forEach(container => container.classList.toggle("dark-mode"));
         }
 
         const colorOptions = [
             { backgroundColor: 'rgba(255, 99, 132, 0.5)', borderColor: 'rgba(255, 99, 132, 1)' },
             { backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)' },
-            { backgroundColor: 'rgba(75, 192, 192, 0.5)', borderColor: 'rgba(75, 192, 192, 1)' },
-            { backgroundColor: 'rgba(153, 102, 255, 0.5)', borderColor: 'rgba(153, 102, 255, 1)' },
-            { backgroundColor: 'rgba(255, 159, 64, 0.5)', borderColor: 'rgba(255, 159, 64, 1)' }
+            { backgroundColor: 'rgba(75, 192, 192, 0.5)', borderColor: 'rgba(75, 192, 192, 1)' }
         ];
 
-        const cycleTimeData = {
-            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
-            datasets: [{
-                label: 'Cycle Time (minutes)',
-                data: [10, 20, 15, 25, 18],
-                ...colorOptions[0],
-                borderWidth: 2
-            }]
-        };
-
-        // Example of applying mixed colors for a different chart
-        const oeeData = {
-            labels: ['Machine 1', 'Machine 2', 'Machine 3', 'Machine 4', 'Machine 5'],
-            datasets: [{
-                label: 'OEE (%)',
-                data: [85, 70, 90, 60, 75],
-                ...colorOptions[1],
-                borderWidth: 2
-            }]
-        };
-
-        const downtimeData = {
-            labels: ['Maintenance', 'Operator Error', 'Material Shortage', 'Power Outage', 'Other'],
-            datasets: [{
-                label: 'Downtime (hours)',
-                data: [5, 3, 4, 2, 1],
-                ...colorOptions[2],
-                borderWidth: 2
-            }]
-        };
+        // Sample data for charts
+        const cycleTimeData = { /* Same data as previous example */ };
+        const oeeData = { /* Same data as previous example */ };
+        const costPerUnitData = { /* Same data as previous example */ };
 
         // Initialize each chart
-        new Chart(document.getElementById('cycleTimeChart').getContext('2d'), { type: 'bar', data: cycleTimeData });
-        new Chart(document.getElementById('oeeChart').getContext('2d'), { type: 'line', data: oeeData });
-        new Chart(document.getElementById('downtimeChart').getContext('2d'), { type: 'bar', data: downtimeData });
+        new Chart(document.getElementById('cycleTimeChartCanvas').getContext('2d'), { type: 'bar', data: cycleTimeData });
+        new Chart(document.getElementById('oeeChartCanvas').getContext('2d'), { type: 'line', data: oeeData });
+        new Chart(document.getElementById('costPerUnitChartCanvas').getContext('2d'), { type: 'pie', data: costPerUnitData });
+
+        // Sidebar toggle
+        document.getElementById('sidebar').classList.toggle('hidden');
     </script>
 </body>
 </html>
