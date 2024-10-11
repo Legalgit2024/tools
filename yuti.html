@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Justice Minds Tools – Yuti Manufacturing</title>
     <style>
+        /* Basic Styles */
         body, html {
             margin: 0;
             padding: 0;
@@ -83,6 +84,7 @@
             padding: 10px 20px;
             border-radius: 30px;
             cursor: pointer;
+            z-index: 1001;
         }
 
         footer {
@@ -93,27 +95,55 @@
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
         }
 
+        /* Mobile Styles */
         @media (max-width: 768px) {
             .sidebar {
-                width: 200px;
+                width: 100%;
+                position: fixed;
                 top: 60px;
+                height: auto;
+                transform: translateY(-100%);
+                transition: transform 0.3s ease;
+                z-index: 999;
             }
 
-            .sidebar.hidden {
-                transform: translateX(-200px);
+            .sidebar.visible {
+                transform: translateY(0);
             }
 
             .content {
                 padding-left: 20px;
+                padding-right: 20px;
+                margin-top: 150px;
             }
 
             .chart-container {
-                width: 95%;
+                width: 100%;
+                margin: 15px 0;
             }
 
             .dark-mode-toggle {
                 top: 70px;
+                right: 20px;
             }
+
+            .sidebar-toggle-btn {
+                display: block;
+            }
+        }
+
+        /* Sidebar Toggle Button for Mobile */
+        .sidebar-toggle-btn {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            background-color: #c0a060;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1001;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -125,8 +155,11 @@
         <div class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
     </div>
 
+    <!-- Sidebar Toggle Button for Mobile -->
+    <div class="sidebar-toggle-btn" onclick="toggleSidebar()">Menu</div>
+
     <div class="sidebar hidden" id="sidebar">
-        <h3>Charts Overview</h3>
+        <h3>Chart Inventory</h3>
         <ul>
             <li><a href="#cycleTimeChart">Cycle Time Variation</a></li>
             <li><a href="#oeeChart">Overall Equipment Effectiveness (OEE)</a></li>
@@ -162,24 +195,19 @@
             document.body.classList.toggle("dark-mode");
         }
 
-        const colorOptions = [
-            { backgroundColor: 'rgba(255, 99, 132, 0.5)', borderColor: 'rgba(255, 99, 132, 1)' },
-            { backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)' },
-            { backgroundColor: 'rgba(75, 192, 192, 0.5)', borderColor: 'rgba(75, 192, 192, 1)' }
-        ];
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('visible');
+        }
 
-        // Sample data for charts
-        const cycleTimeData = { /* Same data as previous example */ };
-        const oeeData = { /* Same data as previous example */ };
-        const costPerUnitData = { /* Same data as previous example */ };
+        // Chart Initialization
+        const cycleTimeData = { /* Add your data */ };
+        const oeeData = { /* Add your data */ };
+        const costPerUnitData = { /* Add your data */ };
 
-        // Initialize each chart
         new Chart(document.getElementById('cycleTimeChartCanvas').getContext('2d'), { type: 'bar', data: cycleTimeData });
         new Chart(document.getElementById('oeeChartCanvas').getContext('2d'), { type: 'line', data: oeeData });
         new Chart(document.getElementById('costPerUnitChartCanvas').getContext('2d'), { type: 'pie', data: costPerUnitData });
-
-        // Sidebar toggle
-        document.getElementById('sidebar').classList.toggle('hidden');
     </script>
 </body>
 </html>
