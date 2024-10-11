@@ -10,18 +10,25 @@
             padding: 0;
             height: 100%;
             font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
         }
 
         .dark-mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 40px;
+            position: absolute;
+            top: 100px; /* Adjusted to be below the hero bar */
+            left: 40px;
             background-color: #c0a060;
             color: #fff;
             padding: 10px 20px;
             border-radius: 30px;
             cursor: pointer;
             z-index: 1001;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #a08850;
         }
 
         body.dark-mode {
@@ -33,37 +40,7 @@
             background: #222;
         }
 
-        .sidebar {
-            width: 300px;
-            background: #1a1a1a;
-            padding: 20px;
-            position: fixed;
-            height: 100vh;
-            top: 0;
-            left: 0;
-            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .sidebar h3 {
-            color: #c0a060;
-            margin-bottom: 15px;
-        }
-
-        .stat-item {
-            margin-bottom: 20px;
-        }
-
-        .stat-item p {
-            color: #bbb;
-        }
-
-        .content {
-            margin-left: 320px;
-            padding: 40px;
-            width: calc(100% - 320px);
-        }
-
-        header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,7 +50,6 @@
             position: fixed;
             width: 100%;
             top: 0;
-            left: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
         }
@@ -85,32 +61,11 @@
             text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
         }
 
-        .nav-links {
-            list-style: none;
-            display: flex;
-        }
-
-        .nav-links li {
-            margin-left: 20px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #c0a060;
-        }
-
         .charts {
             padding: 60px 40px;
             background-color: #1a1a1a;
             color: #e0e0e0;
             text-align: center;
-            margin-top: 100px;
         }
 
         .chart-container {
@@ -146,50 +101,49 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="vsc-initialized">
+
+    <div class="header">
+        <div class="logo">Yuti Tools</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Charts</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+
     <div class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
-    <div class="sidebar">
-        <h3>Chart Inventory</h3>
-        <div class="stat-item">
-            <h4>Cycle Time Variation</h4>
+
+    <section class="charts">
+        <h2>Interactive Charts</h2>
+        <div class="chart-container">
+            <h3>Cycle Time Variation</h3>
+            <canvas id="cycleTimeChart"></canvas>
         </div>
-        <div class="stat-item">
-            <h4>Overall Equipment Effectiveness (OEE)</h4>
+        <div class="chart-container">
+            <h3>Overall Equipment Effectiveness (OEE)</h3>
+            <canvas id="oeeChart"></canvas>
         </div>
-        <div class="stat-item">
-            <h4>Cost per Unit Analysis</h4>
+        <div class="chart-container">
+            <h3>Cost per Unit Analysis</h3>
+            <canvas id="costPerUnitChart"></canvas>
         </div>
-    </div>
-    <div class="content">
-        <header>
-            <div class="logo">Yuti Tools</div>
-            <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Features</a></li>
-                <li><a href="#">Charts</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </header>
-        <section class="charts">
-            <h2>Interactive Charts</h2>
-            <div class="chart-container">
-                <h3>Cycle Time Variation</h3>
-                <canvas id="cycleTimeChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Overall Equipment Effectiveness (OEE)</h3>
-                <canvas id="oeeChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Cost per Unit Analysis</h3>
-                <canvas id="costPerUnitChart"></canvas>
-            </div>
-        </section>
-        <footer>
-            <p>© 2024 Justice Minds Tools. All Rights Reserved.</p>
-            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-        </footer>
-    </div>
+        <div class="chart-container">
+            <h3>Production Yield by Stage</h3>
+            <canvas id="yieldChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Downtime Hours by Stage</h3>
+            <canvas id="downtimeChart"></canvas>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2024 Justice Minds Tools. All Rights Reserved.</p>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </footer>
+
     <script>
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
@@ -197,48 +151,25 @@
             chartContainers.forEach(container => container.classList.toggle("dark-mode"));
         }
 
-        // Sample data for charts
         const cycleTimeData = {
             labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
-            datasets: [{
-                label: 'Cycle Time (minutes)',
-                data: [10, 20, 15, 25, 18],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 2
-            }]
+            datasets: [{ label: 'Cycle Time (minutes)', data: [10, 20, 15, 25, 18], backgroundColor: 'rgba(255, 99, 132, 0.5)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2 }]
         };
         const oeeData = {
             labels: ['Machine 1', 'Machine 2', 'Machine 3', 'Machine 4', 'Machine 5'],
-            datasets: [{
-                label: 'OEE (%)',
-                data: [85, 70, 90, 60, 75],
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 2
-            }]
+            datasets: [{ label: 'OEE (%)', data: [85, 70, 90, 60, 75], backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2 }]
         };
         const costPerUnitData = {
             labels: ['Material', 'Labor', 'Overhead', 'Energy', 'Other'],
-            datasets: [{
-                label: 'Cost ($)',
-                data: [30, 25, 20, 15, 10],
-                backgroundColor: [
-                    'rgba(255, 206, 86, 0.5)',
-                    'rgba(75, 192, 192, 0.5)',
-                    'rgba(153, 102, 255, 0.5)',
-                    'rgba(255, 159, 64, 0.5)',
-                    'rgba(201, 203, 207, 0.5)'
-                ],
-                borderColor: [
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(201, 203, 207, 1)'
-                ],
-                borderWidth: 2
-            }]
+            datasets: [{ label: 'Cost ($)', data: [30, 25, 20, 15, 10], backgroundColor: ['rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)', 'rgba(201, 203, 207, 0.5)'], borderColor: ['rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(201, 203, 207, 1)'], borderWidth: 2 }]
+        };
+        const yieldData = {
+            labels: ['Decoiler', 'Roll Forming', 'Flip Mechanism', 'Spot Welding', 'Multi-Spot Welding'],
+            datasets: [{ label: 'Yield (%)', data: [86, 88, 90, 92, 94], backgroundColor: 'rgba(46, 204, 113, 0.5)', borderColor: 'rgba(39, 174, 96, 1)', borderWidth: 2 }]
+        };
+        const downtimeData = {
+            labels: ['Decoiler', 'Roll Forming', 'Flip Mechanism', 'Spot Welding', 'Multi-Spot Welding'],
+            datasets: [{ label: 'Downtime (hours)', data: [5, 3, 4, 2, 1], backgroundColor: 'rgba(255, 99, 132, 0.5)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2 }]
         };
 
         const animationOptions = {
@@ -248,53 +179,20 @@
             }
         };
 
-        // Initialize charts
         const cycleTimeChartCtx = document.getElementById('cycleTimeChart').getContext('2d');
-        new Chart(cycleTimeChartCtx, {
-            type: 'bar',
-            data: cycleTimeData,
-            options: {
-                ...animationOptions,
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' }
-                },
-                scales: {
-                    x: { beginAtZero: true },
-                    y: { beginAtZero: true }
-                }
-            }
-        });
+        new Chart(cycleTimeChartCtx, { type: 'bar', data: cycleTimeData, options: { ...animationOptions, responsive: true } });
 
         const oeeChartCtx = document.getElementById('oeeChart').getContext('2d');
-        new Chart(oeeChartCtx, {
-            type: 'line',
-            data: oeeData,
-            options: {
-                ...animationOptions,
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' }
-                },
-                scales: {
-                    x: { beginAtZero: true },
-                    y: { beginAtZero: true }
-                }
-            }
-        });
+        new Chart(oeeChartCtx, { type: 'line', data: oeeData, options: { ...animationOptions, responsive: true } });
 
         const costPerUnitChartCtx = document.getElementById('costPerUnitChart').getContext('2d');
-        new Chart(costPerUnitChartCtx, {
-            type: 'pie',
-            data: costPerUnitData,
-            options: {
-                ...animationOptions,
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' }
-                }
-            }
-        });
+        new Chart(costPerUnitChartCtx, { type: 'pie', data: costPerUnitData, options: { ...animationOptions, responsive: true } });
+
+        const yieldChartCtx = document.getElementById('yieldChart').getContext('2d');
+        new Chart(yieldChartCtx, { type: 'line', data: yieldData, options: { ...animationOptions, responsive: true } });
+
+        const downtimeChartCtx = document.getElementById('downtimeChart').getContext('2d');
+        new Chart(downtimeChartCtx, { type: 'bar', data: downtimeData, options: { ...animationOptions, responsive: true } });
     </script>
 </body>
 </html>
