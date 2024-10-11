@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Justice Minds Tools – For Yuti Manufacturing</title>
     <style>
-        /* Base styles */
         body, html {
             margin: 0;
             padding: 0;
@@ -81,7 +80,15 @@
 
         .sidebar .chart-item {
             margin-bottom: 15px;
+        }
+
+        .sidebar .chart-item a {
             color: #e0e0e0;
+            text-decoration: none;
+        }
+
+        .sidebar .chart-item a:hover {
+            text-decoration: underline;
         }
 
         .content {
@@ -89,7 +96,14 @@
             padding: 40px;
             width: calc(100% - 270px);
             padding-top: 100px;
-            background-color: #1a1a1a;
+        }
+
+        .middle-text {
+            background: rgba(30, 30, 30, 0.9);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            text-align: center;
         }
 
         .chart-container {
@@ -128,42 +142,11 @@
         footer a:hover {
             text-decoration: underline;
         }
-
-        /* Media Queries for Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .header, footer {
-                padding: 10px 20px;
-            }
-
-            .logo {
-                font-size: 1.4em;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                top: 0;
-                left: 0;
-                box-shadow: none;
-            }
-
-            .content {
-                margin-left: 0;
-                width: 100%;
-                padding: 20px;
-                padding-top: 60px;
-            }
-
-            .chart-container {
-                width: 100%;
-                margin: 10px 0;
-            }
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <div class="header">
         <div class="logo">Yuti Tools</div>
         <div class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</div>
@@ -171,33 +154,37 @@
 
     <div class="sidebar">
         <h3>Chart Inventory</h3>
-        <div class="chart-item">Cycle Time Variation</div>
-        <div class="chart-item">Overall Equipment Effectiveness (OEE)</div>
-        <div class="chart-item">Cost per Unit Analysis</div>
-        <div class="chart-item">Production Yield by Stage</div>
-        <div class="chart-item">Downtime Hours by Stage</div>
+        <div class="chart-item"><a href="#cycleTimeChart">Cycle Time Variation</a></div>
+        <div class="chart-item"><a href="#oeeChart">Overall Equipment Effectiveness (OEE)</a></div>
+        <div class="chart-item"><a href="#costPerUnitChart">Cost per Unit Analysis</a></div>
+        <div class="chart-item"><a href="#yieldChart">Production Yield by Stage</a></div>
+        <div class="chart-item"><a href="#downtimeChart">Downtime Analysis</a></div>
     </div>
 
     <div class="content">
+        <div class="middle-text">
+            <p>Insert your descriptive content or analysis here. This section can provide context or explanations for the data visualizations displayed below.</p>
+        </div>
+
         <section class="charts">
-            <div class="chart-container">
+            <div class="chart-container" id="cycleTimeChartContainer">
                 <h3>Cycle Time Variation</h3>
                 <canvas id="cycleTimeChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-container" id="oeeChartContainer">
                 <h3>Overall Equipment Effectiveness (OEE)</h3>
                 <canvas id="oeeChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-container" id="costPerUnitChartContainer">
                 <h3>Cost per Unit Analysis</h3>
                 <canvas id="costPerUnitChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-container" id="yieldChartContainer">
                 <h3>Production Yield by Stage</h3>
                 <canvas id="yieldChart"></canvas>
             </div>
-            <div class="chart-container">
-                <h3>Downtime Hours by Stage</h3>
+            <div class="chart-container" id="downtimeChartContainer">
+                <h3>Downtime Analysis</h3>
                 <canvas id="downtimeChart"></canvas>
             </div>
         </section>
@@ -215,36 +202,49 @@
             chartContainers.forEach(container => container.classList.toggle("dark-mode"));
         }
 
-        // Chart.js setup
-        const animationOptions = {
-            animation: {
-                duration: 1500,
-                easing: 'easeInOutQuart'
-            }
+        const colorOptions = [
+            { backgroundColor: 'rgba(255, 99, 132, 0.5)', borderColor: 'rgba(255, 99, 132, 1)' },
+            { backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)' },
+            { backgroundColor: 'rgba(75, 192, 192, 0.5)', borderColor: 'rgba(75, 192, 192, 1)' },
+            { backgroundColor: 'rgba(153, 102, 255, 0.5)', borderColor: 'rgba(153, 102, 255, 1)' },
+            { backgroundColor: 'rgba(255, 159, 64, 0.5)', borderColor: 'rgba(255, 159, 64, 1)' }
+        ];
+
+        const cycleTimeData = {
+            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+            datasets: [{
+                label: 'Cycle Time (minutes)',
+                data: [10, 20, 15, 25, 18],
+                ...colorOptions[0],
+                borderWidth: 2
+            }]
         };
 
-        // Chart data configurations
-        const cycleTimeData = { /* data for cycle time chart */ };
-        const oeeData = { /* data for OEE chart */ };
-        const costPerUnitData = { /* data for cost per unit */ };
-        const yieldData = { /* data for yield */ };
-        const downtimeData = { /* data for downtime */ };
+        // Example of applying mixed colors for a different chart
+        const oeeData = {
+            labels: ['Machine 1', 'Machine 2', 'Machine 3', 'Machine 4', 'Machine 5'],
+            datasets: [{
+                label: 'OEE (%)',
+                data: [85, 70, 90, 60, 75],
+                ...colorOptions[1],
+                borderWidth: 2
+            }]
+        };
 
-        // Initialize charts
-        const cycleTimeChartCtx = document.getElementById('cycleTimeChart').getContext('2d');
-        new Chart(cycleTimeChartCtx, { type: 'bar', data: cycleTimeData, options: { ...animationOptions, responsive: true } });
+        const downtimeData = {
+            labels: ['Maintenance', 'Operator Error', 'Material Shortage', 'Power Outage', 'Other'],
+            datasets: [{
+                label: 'Downtime (hours)',
+                data: [5, 3, 4, 2, 1],
+                ...colorOptions[2],
+                borderWidth: 2
+            }]
+        };
 
-        const oeeChartCtx = document.getElementById('oeeChart').getContext('2d');
-        new Chart(oeeChartCtx, { type: 'line', data: oeeData, options: { ...animationOptions, responsive: true } });
-
-        const costPerUnitChartCtx = document.getElementById('costPerUnitChart').getContext('2d');
-        new Chart(costPerUnitChartCtx, { type: 'pie', data: costPerUnitData, options: { ...animationOptions, responsive: true } });
-
-        const yieldChartCtx = document.getElementById('yieldChart').getContext('2d');
-        new Chart(yieldChartCtx, { type: 'line', data: yieldData, options: { ...animationOptions, responsive: true } });
-
-        const downtimeChartCtx = document.getElementById('downtimeChart').getContext('2d');
-        new Chart(downtimeChartCtx, { type: 'bar', data: downtimeData, options: { ...animationOptions, responsive: true } });
+        // Initialize each chart
+        new Chart(document.getElementById('cycleTimeChart').getContext('2d'), { type: 'bar', data: cycleTimeData });
+        new Chart(document.getElementById('oeeChart').getContext('2d'), { type: 'line', data: oeeData });
+        new Chart(document.getElementById('downtimeChart').getContext('2d'), { type: 'bar', data: downtimeData });
     </script>
 </body>
 </html>
