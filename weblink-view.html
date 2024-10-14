@@ -14,7 +14,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         h1 {
@@ -43,17 +43,16 @@
         #previewContainer {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-around;
+            justify-content: space-between;
             margin-top: 20px;
         }
         .preview-card {
-            width: 300px;
-            margin: 10px;
+            width: calc(25% - 20px);
+            margin: 10px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
             transition: transform 0.3s ease;
         }
         .preview-card:hover {
@@ -69,19 +68,68 @@
             padding: 15px;
         }
         .preview-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .preview-description {
-            font-size: 14px;
+            font-size: 12px;
             color: #ddd;
             margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         .preview-url {
-            font-size: 12px;
+            font-size: 10px;
             color: #aaa;
             word-break: break-all;
+        }
+        .preview-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .action-button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        #shareContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        #shareUrl {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        #copyShareUrl {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -93,10 +141,18 @@
         <div id="previewContainer"></div>
     </div>
 
+    <div id="shareContainer">
+        <input type="text" id="shareUrl" readonly>
+        <button id="copyShareUrl">Copy Share URL</button>
+    </div>
+
     <script>
         const linkInput = document.getElementById('linkInput');
         const generateButton = document.getElementById('generateButton');
         const previewContainer = document.getElementById('previewContainer');
+        const shareContainer = document.getElementById('shareContainer');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyShareUrl = document.getElementById('copyShareUrl');
 
         generateButton.addEventListener('click', generatePreviews);
 
@@ -107,7 +163,6 @@
             for (const link of links) {
                 const previewCard = document.createElement('div');
                 previewCard.className = 'preview-card';
-                previewCard.addEventListener('click', () => window.open(link, '_blank'));
 
                 const previewImage = document.createElement('div');
                 previewImage.className = 'preview-image';
@@ -126,12 +181,24 @@
                 previewUrl.className = 'preview-url';
                 previewUrl.textContent = link;
 
+                const previewActions = document.createElement('div');
+                previewActions.className = 'preview-actions';
+
+                const embedButton = createActionButton('🔗', () => embedLink(link));
+                const copyButton = createActionButton('📋', () => copyToClipboard(link));
+                const shareButton = createActionButton('🔗', () => shareLink(link));
+
+                previewActions.appendChild(embedButton);
+                previewActions.appendChild(copyButton);
+                previewActions.appendChild(shareButton);
+
                 previewContent.appendChild(previewTitle);
                 previewContent.appendChild(previewDescription);
                 previewContent.appendChild(previewUrl);
 
                 previewCard.appendChild(previewImage);
                 previewCard.appendChild(previewContent);
+                previewCard.appendChild(previewActions);
 
                 previewContainer.appendChild(previewCard);
 
@@ -154,6 +221,50 @@
                 }
             }
         }
+
+        function createActionButton(text, onClick) {
+            const button = document.createElement('button');
+            button.className = 'action-button';
+            button.textContent = text;
+            button.addEventListener('click', onClick);
+            return button;
+        }
+
+        function embedLink(link) {
+            const embedCode = `<iframe src="${link}" width="100%" height="500" frameborder="0"></iframe>`;
+            copyToClipboard(embedCode);
+            alert('Embed code copied to clipboard!');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function shareLink(link) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('share', link);
+            shareUrl.value = currentUrl.toString();
+            shareContainer.style.display = 'block';
+        }
+
+        copyShareUrl.addEventListener('click', () => {
+            copyToClipboard(shareUrl.value);
+            shareContainer.style.display = 'none';
+        });
+
+        // Check for shared link on page load
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedLink = urlParams.get('share');
+            if (sharedLink) {
+                linkInput.value = sharedLink;
+                generatePreviews();
+            }
+        });
     </script>
 </body>
 </html>
