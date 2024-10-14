@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PDF OCR & Analysis Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 50%;
+            padding: 20px;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+        }
+        .main-content {
+            width: 50%;
+            height: 100vh;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .tool-section {
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        input[type="text"], input[type="number"], input[type="file"], input[type="url"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .preview-window {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 100px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div id="tools-container">
+            <h1>Advanced PDF OCR & Analysis Tool</h1>
+            
+            <div class="tool-section">
+                <h2>Load Content</h2>
+                <input type="url" id="content-url" placeholder="Enter URL to load content">
+                <button class="button" onclick="loadContent()">Load Content</button>
+            </div>
+
+            <div class="tool-section">
+                <h2>Upload Your File</h2>
+                <input type="file" id="file-upload" accept=".pdf,.csv">
+                <button class="button" onclick="processFile()">Process File</button>
+            </div>
+
+            <div class="tool-section">
+                <h2>Word Extraction and Context</h2>
+                <input type="text" id="search-term" placeholder="Enter word to search">
+                <label for="context-periods">Number of periods for context:</label>
+                <input type="number" id="context-periods" min="1" max="5" value="2">
+                <button class="button" onclick="extractWords()">Extract Words</button>
+                <div id="extracted-words" class="preview-window"></div>
+            </div>
+
+            <div class="tool-section">
+                <h2>Highlighting and Annotations</h2>
+                <input type="text" id="highlight-term" placeholder="Enter term to highlight">
+                <button class="button" onclick="highlightTerms()">Highlight</button>
+                <div id="highlight-list" class="preview-window"></div>
+            </div>
+
+            <div class="tool-section">
+                <h2>Export and Analysis</h2>
+                <button class="button" onclick="exportPDF()">Export Annotated PDF</button>
+                <button class="button" onclick="generateReport()">Generate Analysis Report</button>
+            </div>
+
+            <div class="tool-section">
+                <h2>Table Search</h2>
+                <input type="text" id="table-search-term" placeholder="Enter word to search in tables">
+                <button class="button" onclick="searchTables()">Search Tables</button>
+                <div id="table-search-results" class="preview-window"></div>
+            </div>
+        </div>
+    </div>
+    <div class="main-content" id="content-frame">
+        <iframe id="content-iframe" src="about:blank" title="Content Frame"></iframe>
+    </div>
+
+    <script>
+        function loadContent() {
+            const contentUrl = document.getElementById('content-url').value;
+            if (contentUrl) {
+                document.getElementById('content-iframe').src = contentUrl;
+            } else {
+                alert("Please enter a valid URL");
+            }
+        }
+
+        function processFile() {
+            // Implement file processing logic here
+            console.log("Processing file...");
+        }
+
+        function extractWords() {
+            const searchTerm = document.getElementById('search-term').value;
+            const contextPeriods = document.getElementById('context-periods').value;
+            // Implement word extraction logic here
+            console.log(`Extracting words for "${searchTerm}" with ${contextPeriods} context periods...`);
+        }
+
+        function highlightTerms() {
+            const highlightTerm = document.getElementById('highlight-term').value;
+            // Implement highlighting logic here
+            console.log(`Highlighting terms: ${highlightTerm}`);
+        }
+
+        function exportPDF() {
+            // Implement PDF export logic here
+            console.log("Exporting annotated PDF...");
+        }
+
+        function generateReport() {
+            // Implement report generation logic here
+            console.log("Generating analysis report...");
+        }
+
+        function searchTables() {
+            const tableSearchTerm = document.getElementById('table-search-term').value;
+            // Implement table search logic here
+            console.log(`Searching tables for: ${tableSearchTerm}`);
+        }
+
+        // Load the default content
+        window.onload = function() {
+            document.getElementById('content-url').value = "https://benmak9.craft.me/f9L2r30ItlwwDK";
+            loadContent();
+        }
+    </script>
+</body>
+</html>
