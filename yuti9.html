@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuti Tools – Premium Manufacturing Solutions</title>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --text-color: #e0e0e0;
+            --sidebar-bg: #1a1a1a;
+            --header-bg: rgba(15, 15, 15, 0.9);
+            --accent-color: #c0a060;
+            --chart-bg: #111;
+            --chart-hover-bg: #222;
+            --footer-bg: #141414;
+        }
+        .light-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #333;
+            --sidebar-bg: #e0e0e0;
+            --header-bg: rgba(240, 240, 240, 0.9);
+            --accent-color: #8b7035;
+            --chart-bg: #fff;
+            --chart-hover-bg: #f5f5f5;
+            --footer-bg: #e0e0e0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: all 0.5s ease;
+        }
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            top: 0;
+            left: -300px;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease;
+            z-index: 1001;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        .stat-item {
+            margin-bottom: 20px;
+        }
+        .stat-item p {
+            color: var(--text-color);
+        }
+        .content {
+            padding: 40px;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: var(--header-bg);
+            color: var(--text-color);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+        .nav-links li {
+            margin-left: 20px;
+        }
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+        .charts {
+            padding: 60px 40px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+            text-align: center;
+            margin-top: 60px;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 30px auto;
+            background: var(--chart-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease;
+        }
+        .chart-container:hover {
+            background: var(--chart-hover-bg);
+        }
+        footer {
+            background: var(--footer-bg);
+            color: var(--text-color);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+        }
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        #toggleSidebar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        #toggleTheme {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1002;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .chart-container {
+                width: 95%;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button id="toggleSidebar">☰</button>
+    <button id="toggleTheme">🌓</button>
+    
+    <div class="sidebar">
+        <h3>Chart Insights</h3>
+        <div class="stat-item">
+            <h4>Cycle Time Variation</h4>
+            <p>Shows the time taken for each stage of the process. Helps identify stages causing delays.</p>
+        </div>
+        <div class="stat-item">
+            <h4>Overall Equipment Effectiveness (OEE)</h4>
+            <p>Measures equipment productivity, indicating how effectively equipment is utilized.</p>
+        </div>
+        <div class="stat-item">
+            <h4>Cost per Unit Analysis</h4>
+            <p>Breaks down costs into categories like materials, labor, overhead, and energy to optimize spending.</p>
+        </div>
+    </div>
+
+    <div class="content">
+        <header>
+            <div class="logo">Yuti Tools</div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Charts</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </header>
+
+        <section class="charts">
+            <h2>Interactive Charts</h2>
+            <div class="chart-container">
+                <h3>Cycle Time Variation</h3>
+                <canvas id="cycleTimeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Overall Equipment Effectiveness (OEE)</h3>
+                <canvas id="oeeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Cost per Unit Analysis</h3>
+                <canvas id="costPerUnitChart"></canvas>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Yuti Tools. All Rights Reserved.</p>
+            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        const sidebar = document.querySelector('.sidebar');
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const content = document.querySelector('.content');
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            content.style.marginLeft = sidebar.classList.contains('open') ? '300px' : '0';
+        });
+
+        // Toggle theme
+        const toggleThemeBtn = document.getElementById('toggleTheme');
+        const body = document.body;
+
+        toggleThemeBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+        });
+
+        // Chart data and initialization
+        const cycleTimeData = {
+            labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+            datasets: [{
+                label: 'Cycle Time (minutes)',
+                data: [10, 20, 15, 25, 18],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2
+            }]
+        };
+
+        const oeeData = {
+            labels: ['Machine 1', 'Machine 2', 'Machine 3', 'Machine 4', 'Machine 5'],
+            datasets: [{
+                label: 'OEE (%)',
+                data: [85, 70, 90, 60, 75],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2
+            }]
+        };
+
+        const costPerUnitData = {
+            labels: ['Material', 'Labor', 'Overhead', 'Energy', 'Other'],
+            datasets: [{
+                label: 'Cost ($)',
+                data: [30, 25, 20, 15, 10],
+                backgroundColor: [
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)',
+                    'rgba(255, 159, 64, 0.5)',
+                    'rgba(201, 203, 207, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(201, 203, 207, 1)'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        // Initialize charts
+        const cycleTimeChartCtx = document.getElementById('cycleTimeChart').getContext('2d');
+        new Chart(cycleTimeChartCtx, {
+            type: 'bar',
+            data: cycleTimeData,
+            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { beginAtZero: true }, y: { beginAtZero: true } } }
+        });
+
+        const oeeChartCtx = document.getElementById('oeeChart').getContext('2d');
+        new Chart(oeeChartCtx, {
+            type: 'line',
+            data: oeeData,
+            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { beginAtZero: true }, y: { beginAtZero: true } } }
+        });
+
+        const costPerUnitChartCtx = document.getElementById('costPerUnitChart').getContext('2d');
+        new Chart(costPerUnitChartCtx, {
+            type: 'pie',
+            data: costPerUnitData,
+            options: { responsive: true, plugins: { legend: { position: 'top' } } }
+        });
+    </script>
+</body>
+</html>
