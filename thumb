@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Rich Link Preview Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #000033, #000066);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        #linkInput {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        #generateButton {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #previewContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .preview-card {
+            width: calc(25% - 20px);
+            margin: 10px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .preview-card:hover {
+            transform: scale(1.05);
+        }
+        .preview-image {
+            width: 100%;
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+        }
+        .preview-content {
+            padding: 15px;
+        }
+        .preview-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .preview-description {
+            font-size: 12px;
+            color: #ddd;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .preview-url {
+            font-size: 10px;
+            color: #aaa;
+            word-break: break-all;
+        }
+        .preview-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .action-button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        #shareContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        #shareUrl {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        #copyShareUrl {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive Rich Link Preview Generator</h1>
+        <textarea id="linkInput" placeholder="Enter web links (one per line)"></textarea>
+        <button id="generateButton">Generate Previews</button>
+        <div id="previewContainer"></div>
+    </div>
+
+    <div id="shareContainer">
+        <input type="text" id="shareUrl" readonly>
+        <button id="copyShareUrl">Copy Share URL</button>
+    </div>
+
+    <script>
+        const linkInput = document.getElementById('linkInput');
+        const generateButton = document.getElementById('generateButton');
+        const previewContainer = document.getElementById('previewContainer');
+        const shareContainer = document.getElementById('shareContainer');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyShareUrl = document.getElementById('copyShareUrl');
+
+        generateButton.addEventListener('click', generatePreviews);
+
+        async function fetchMetadata(link) {
+            try {
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(link)}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+
+                const title = doc.querySelector('title')?.textContent 
+                    || doc.querySelector('meta[property="og:title"]')?.content 
+                    || 'Untitled';
+                const description = doc.querySelector('meta[name="description"]')?.content 
+                    || doc.querySelector('meta[property="og:description"]')?.content 
+                    || 'No description available';
+                const image = doc.querySelector('meta[property="og:image"]')?.content 
+                    || 'https://via.placeholder.com/300x150?text=No+Image';
+
+                return { title, description, image };
+            } catch (error) {
+                console.error('Error fetching metadata:', error);
+                return { 
+                    title: 'Untitled', 
+                    description: 'No description available', 
+                    image: 'https://via.placeholder.com/300x150?text=Error+Loading+Image' 
+                };
+            }
+        }
+
+        async function generatePreviews() {
+            const links = linkInput.value.split('\n').filter(link => link.trim() !== '');
+            previewContainer.innerHTML = '';
+
+            for (const link of links) {
+                const metadata = await fetchMetadata(link);
+                
+                const previewCard = document.createElement('div');
+                previewCard.className = 'preview-card';
+
+                if (!metadata.title && !metadata.description) {
+                    previewCard.innerHTML = createBasicPreview(link);
+                } else {
+                    previewCard.innerHTML = `
+                        <div class="preview-image" style="background-image: url('${metadata.image}')"></div>
+                        <div class="preview-content">
+                            <div class="preview-title">${metadata.title}</div>
+                            <div class="preview-description">${metadata.description}</div>
+                            <div class="preview-url">${link}</div>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="action-button" onclick="embedLink('${link}')">🔗</button>
+                            <button class="action-button" onclick="copyToClipboard('${link}')">📋</button>
+                            <button class="action-button" onclick="shareLink('${link}')">🔗</button>
+                        </div>
+                    `;
+                }
+
+                previewContainer.appendChild(previewCard);
+            }
+        }
+
+        function createBasicPreview(link) {
+            return `
+                <div class="preview-image" style="background-image: url('https://via.placeholder.com/300x150?text=No+Image')"></div>
+                <div class="preview-content">
+                    <div class="preview-title">Unable to load preview</div>
+                    <div class="preview-description">Please check the URL and try again.</div>
+                    <div class="preview-url">${link}</div>
+                </div>
+                <div class="preview-actions">
+                    <button class="action-button" onclick="copyToClipboard('${link}')">📋</button>
+                </div>
+            `;
+        }
+
+        function embedLink(link) {
+            const embedCode = `<iframe src="${link}" width="100%" height="500" frameborder="0"></iframe>`;
+            copyToClipboard(embedCode);
+            alert('Embed code copied to clipboard!');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function shareLink(link) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('share', link);
+            shareUrl.value = currentUrl.toString();
+            shareContainer.style.display = 'block';
+        }
+
+        copyShareUrl.addEventListener('click', () => {
+            copyToClipboard(shareUrl.value);
+            shareContainer.style.display = 'none';
+        });
+
+        // Check for shared link on page load
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedLink = urlParams.get('share');
+            if (sharedLink) {
+                linkInput.value = sharedLink;
+                generatePreviews();
+            }
+        });
+
+        // Close share container when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!shareContainer.contains(event.target) && !event.target.closest('.action-button')) {
+                shareContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
